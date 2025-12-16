@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Phone Tracker</h1>
+
+        <div class="card" style="margin-bottom: 20px;">
+            <h3>Your Device ID</h3>
+            <p id="my-id" style="font-size: 24px; font-weight: bold; color: #007bff; margin: 10px 0;">...</p>
+            <p style="font-size: 12px; color: #666;">Write this down! If you lose this phone, use this ID to track it.
+            </p>
+            <button onclick="startApp('device')">Start Sharing Location</button>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+
+        <div class="card">
+            <h3>Track a Device</h3>
+            <input type="text" id="targetId" placeholder="Enter Target Device ID..." />
+            <button class="mode-btn" onclick="startApp('track')">Start Tracking</button>
+        </div>
+    </div>
+
+    <script>
+        // Generate or Retrieve Persistent ID
+        let deviceId = localStorage.getItem('device_id');
+        if (!deviceId) {
+            // Generate a random 6-character ID (uppercase alphanumeric)
+            deviceId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            localStorage.setItem('device_id', deviceId);
+        }
+        document.getElementById('my-id').innerText = deviceId;
+
+        function startApp(mode) {
+            if (mode === 'device') {
+                // Tracking MY device
+                // No input needed, just go to share page
+                window.location.href = 'device.html';
+            } else {
+                // Tracking SOMEONE ELSE
+                const targetId = document.getElementById('targetId').value.trim().toUpperCase();
+                if (!targetId) return alert('Please enter the Target Device ID!');
+
+                // Save target ID temporarily for the track page
+                localStorage.setItem('track_target_id', targetId);
+                window.location.href = 'track.html';
+            }
+        }
+    </script>
+</body>
+
+</html>

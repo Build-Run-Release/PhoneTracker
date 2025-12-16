@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Broadcast</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Device Active</h1>
+        <div class="status-indicator"></div>
+        <h2 id="displayId" style="color: #007bff; margin: 5px 0;">ID: Loading...</h2>
+        <p id="status">Waiting for location permission...</p>
+
+        <p style="font-size: 12px; color: #888; margin-top: 20px;">
+            Keep this app open to continue sharing location. <br>
+            Screen can be dimmed.
+        </p>
+
+        <button class="mode-btn" onclick="stopSharing()">Stop Sharing</button>
+    </div>
+
+    <script src="share.js"></script>
+</body>
+
+</html>
