@@ -33,6 +33,14 @@ if (navigator.geolocation) {
                 Accuracy: Within ${Math.round(accuracy)}m
             `;
 
+            // Start basic filtering: if accuracy is too low (>150m), skip it
+            // (Unless it's the very first reading, but for now we filter strictly)
+            // Note: 150m is a "city block" margin.
+            if (accuracy > 150) {
+                statusP.innerHTML += `<br><span style="color:orange">Skipping poor signal (${Math.round(accuracy)}m)</span>`;
+                return;
+            }
+
             // Throttle Network usage
             if (now - lastSent > 2000) {
                 socket.emit('update_location', {

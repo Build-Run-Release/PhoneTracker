@@ -21,6 +21,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 
 // Markers and Paths
 let marker = null;
+let circle = null;
 let path = [];
 let polyline = L.polyline([], { color: '#007bff' }).addTo(map);
 
@@ -38,16 +39,27 @@ socket.on('receive_location', (data) => {
             iconSize: [20, 20],
             iconAnchor: [10, 10]
         });
-        marker = L.marker([latitude, longitude], { icon: customIcon }).addTo(map);
-        // Zoom in on first acquire
-        map.setView([latitude, longitude], 16);
+    });
+marker = L.marker([latitude, longitude], { icon: customIcon }).addTo(map);
+
+// Add Accuracy Circle
+circle = L.circle([latitude, longitude], { radius: data.accuracy || 50, color: '#007bff', opacity: 0.3, fillOpacity: 0.1 }).addTo(map);
+
+// Zoom in on first acquire
+map.setView([latitude, longitude], 16);
     }
 
-    // Add to path history
-    path.push([latitude, longitude]);
-    polyline.setLatLngs(path);
+// Update Circle with new position and accuracy
+if (circle) {
+    circle.setLatLng([latitude, longitude]);
+    circle.setRadius(data.accuracy || 50);
+}
 
-    // Smart Auto-pan: Keep centered unless user drags away
-    // (Simple version: always pan for now to ensure tracking is visible)
-    map.flyTo([latitude, longitude], map.getZoom());
+// Add to path history
+path.push([latitude, longitude]);
+polyline.setLatLngs(path);
+
+// Smart Auto-pan: Keep centered unless user drags away
+// (Simple version: always pan for now to ensure tracking is visible)
+map.flyTo([latitude, longitude], map.getZoom());
 });
