@@ -57,6 +57,11 @@ io.on("connection", (socket) => {
         io.to(data.room).emit("receive_location", data);
     });
 
+    socket.on("stop_sharing", (room) => {
+        console.log(`User stopped sharing in room: ${room}`);
+        io.to(room).emit("device_stopped");
+    });
+
     socket.on("disconnect", () => {
         console.log("User disconnected");
     });

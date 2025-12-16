@@ -20,7 +20,7 @@ if (navigator.geolocation) {
     let lastSent = 0;
 
     // Watch position for real-time updates
-    const watchId = navigator.geolocation.watchPosition(
+    window.watchId = navigator.geolocation.watchPosition(
         (position) => {
             const { latitude, longitude, accuracy, speed, heading } = position.coords;
             const now = Date.now();
@@ -104,3 +104,42 @@ document.addEventListener('visibilitychange', async () => {
         requestWakeLock();
     }
 });
+
+function stopSharing() {
+    // 1. Stop GPS Watch
+    if (window.watchId !== undefined) {
+        navigator.geolocation.clearWatch(window.watchId);
+        window.watchId = undefined;
+    }
+
+    // 2. Notify Server
+    if (myId) {
+        socket.emit('stop_sharing', myId);
+    }
+
+    // 3. Update UI
+    const statusP = document.getElementById('status');
+    if (statusP) {
+        statusP.innerHTML = `<span style="color: red; font-weight: bold;">Sharing Stopped.</span><br>Reload page to restart.`;
+    }
+
+    // 4. Release Wake Lock
+    if (wakeLock) {
+        wakeLock.release()
+            .then(() => {
+                wakeLock = null;
+                console.log('Wake Lock released');
+            });
+    }
+
+    // 5. Disable Stop Button (optional visual cue)
+    const btn = document.querySelector('.mode-btn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Stopped";
+        btn.style.backgroundColor = "#ccc";
+    }
+}
+
+// Explicitly export to window to avoid ReferenceError
+window.stopSharing = stopSharing;

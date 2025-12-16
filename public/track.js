@@ -25,8 +25,32 @@ let circle = null;
 let path = [];
 let polyline = L.polyline([], { color: '#007bff' }).addTo(map);
 
+// "Searching" Overlay or Status
+// check if overlay exists, if not create it
+let overlay = document.getElementById('searching-overlay');
+if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'searching-overlay';
+    overlay.style.position = 'absolute';
+    overlay.style.top = '10px';
+    overlay.style.left = '50%';
+    overlay.style.transform = 'translateX(-50%)';
+    overlay.style.zIndex = '1000';
+    overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    overlay.style.color = 'white';
+    overlay.style.padding = '10px 20px';
+    overlay.style.borderRadius = '20px';
+    overlay.style.fontFamily = 'sans-serif';
+    overlay.innerHTML = 'Searching for device signal...';
+    document.body.appendChild(overlay);
+}
+
 // Listen for updates
 socket.on('receive_location', (data) => {
+    // Hide searching overlay once we get data
+    const overlay = document.getElementById('searching-overlay');
+    if (overlay) overlay.style.display = 'none';
+
     const { latitude, longitude } = data;
 
     // Update or Create Marker
@@ -60,5 +84,19 @@ socket.on('receive_location', (data) => {
 
     // Smart Auto-pan: Keep centered unless user drags away
     // (Simple version: always pan for now to ensure tracking is visible)
+    // Smart Auto-pan: Keep centered unless user drags away
+    // (Simple version: always pan for now to ensure tracking is visible)
     map.flyTo([latitude, longitude], map.getZoom());
+});
+
+socket.on('device_stopped', () => {
+    alert("The device has stopped sharing its location.");
+
+    // Optional: Visual indication on map
+    const overlay = document.getElementById('searching-overlay');
+    if (overlay) {
+        overlay.style.display = 'block';
+        overlay.innerText = "Tracking Session Ended";
+        overlay.style.backgroundColor = 'rgba(255, 0, 0, 0.7)';
+    }
 });
