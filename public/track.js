@@ -47,6 +47,7 @@ socket.on('receive_location', (data) => {
     path.push([latitude, longitude]);
     polyline.setLatLngs(path);
 
-    // Optional: Auto-pan if map is not being interacted with
-    map.panTo([latitude, longitude]);
+    // Smart Auto-pan: Keep centered unless user drags away
+    // (Simple version: always pan for now to ensure tracking is visible)
+    map.flyTo([latitude, longitude], map.getZoom());
 });

@@ -16,11 +16,16 @@ socket.emit('join', myId);
 if (navigator.geolocation) {
     statusP.innerText = `Connecting to satellite...`;
 
+    // Throttling: Send update max once per 2 seconds
+    let lastSent = 0;
+
     // Watch position for real-time updates
     const watchId = navigator.geolocation.watchPosition(
         (position) => {
             const { latitude, longitude, accuracy, speed, heading } = position.coords;
+            const now = Date.now();
 
+            // Update UI immediately for user feedback
             statusP.innerHTML = `
                 Broadcasting Location...<br>
                 Lat: ${latitude.toFixed(5)}<br>
@@ -28,14 +33,17 @@ if (navigator.geolocation) {
                 Accuracy: Within ${Math.round(accuracy)}m
             `;
 
-            // Emit to server
-            socket.emit('update_location', {
-                room: myId,
-                latitude,
-                longitude,
-                accuracy,
-                timestamp: new Date().getTime()
-            });
+            // Throttle Network usage
+            if (now - lastSent > 2000) {
+                socket.emit('update_location', {
+                    room: myId,
+                    latitude,
+                    longitude,
+                    accuracy,
+                    timestamp: now
+                });
+                lastSent = now;
+            }
         },
         (error) => {
             console.error(error);
@@ -63,8 +71,7 @@ if (navigator.geolocation) {
     statusP.innerText = "Error: GPS not supported on this browser.";
 }
 
-window.location.href = 'index.html';
-}
+
 
 // --- Wake Lock API to prevent screen sleep ---
 let wakeLock = null;
