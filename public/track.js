@@ -39,27 +39,26 @@ socket.on('receive_location', (data) => {
             iconSize: [20, 20],
             iconAnchor: [10, 10]
         });
-    });
-marker = L.marker([latitude, longitude], { icon: customIcon }).addTo(map);
+        marker = L.marker([latitude, longitude], { icon: customIcon }).addTo(map);
 
-// Add Accuracy Circle
-circle = L.circle([latitude, longitude], { radius: data.accuracy || 50, color: '#007bff', opacity: 0.3, fillOpacity: 0.1 }).addTo(map);
+        // Add Accuracy Circle
+        circle = L.circle([latitude, longitude], { radius: data.accuracy || 50, color: '#007bff', opacity: 0.3, fillOpacity: 0.1 }).addTo(map);
 
-// Zoom in on first acquire
-map.setView([latitude, longitude], 16);
+        // Zoom in on first acquire
+        map.setView([latitude, longitude], 16);
     }
 
-// Update Circle with new position and accuracy
-if (circle) {
-    circle.setLatLng([latitude, longitude]);
-    circle.setRadius(data.accuracy || 50);
-}
+    // Update Circle with new position and accuracy
+    if (circle) {
+        circle.setLatLng([latitude, longitude]);
+        circle.setRadius(data.accuracy || 50);
+    }
 
-// Add to path history
-path.push([latitude, longitude]);
-polyline.setLatLngs(path);
+    // Add to path history
+    path.push([latitude, longitude]);
+    polyline.setLatLngs(path);
 
-// Smart Auto-pan: Keep centered unless user drags away
-// (Simple version: always pan for now to ensure tracking is visible)
-map.flyTo([latitude, longitude], map.getZoom());
+    // Smart Auto-pan: Keep centered unless user drags away
+    // (Simple version: always pan for now to ensure tracking is visible)
+    map.flyTo([latitude, longitude], map.getZoom());
 });
