@@ -25,20 +25,39 @@ if (navigator.geolocation) {
             const { latitude, longitude, accuracy, speed, heading } = position.coords;
             const now = Date.now();
 
+            // Signal Quality Classification
+            let signalQuality = "Unknown";
+            let signalColor = "gray";
+
+            if (accuracy <= 10) {
+                signalQuality = "Pinpoint";
+                signalColor = "#28a745"; // Green
+            } else if (accuracy <= 30) {
+                signalQuality = "Good";
+                signalColor = "#007bff"; // Blue
+            } else if (accuracy <= 100) {
+                signalQuality = "Fair";
+                signalColor = "#ffc107"; // Yellow
+            } else {
+                signalQuality = "Poor";
+                signalColor = "#dc3545"; // Red
+            }
+
             // Update UI immediately for user feedback
             statusP.innerHTML = `
                 Broadcasting Location...<br>
+                <strong style="color: ${signalColor}">Signal: ${signalQuality} (±${Math.round(accuracy)}m)</strong><br>
                 Lat: ${latitude.toFixed(5)}<br>
                 Lon: ${longitude.toFixed(5)}<br>
-                Accuracy: Within ${Math.round(accuracy)}m
+                Speed: ${speed ? (speed * 3.6).toFixed(1) + ' km/h' : '0 km/h'}
             `;
 
-            // Start basic filtering: if accuracy is too low (>150m), skip it
-            // (Unless it's the very first reading, but for now we filter strictly)
-            // Note: 150m is a "city block" margin.
-            if (accuracy > 150) {
-                statusP.innerHTML += `<br><span style="color:orange">Skipping poor signal (${Math.round(accuracy)}m)</span>`;
-                return;
+            // Strict Filtering: Skip updates with very poor accuracy (> 100m)
+            // unless it's the very first update (to ensure we at least get on the map)
+            if (accuracy > 100) {
+                statusP.innerHTML += `<br><span style="color:orange">⚠ Filtering poor signal (Acc: ${Math.round(accuracy)}m)</span>`;
+                // We still let it pass if we haven't sent anything yet, so they know it's working
+                if (lastSent !== 0) return;
             }
 
             // Throttle Network usage
