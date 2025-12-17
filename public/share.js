@@ -82,7 +82,7 @@ if (navigator.geolocation) {
                     statusP.innerText = "Error: Signal Unavailable.";
                     break;
                 case error.TIMEOUT:
-                    statusP.innerText = "Error: Timeout.";
+                    statusP.innerText = "Error: GPS Timeout. Move outdoors for better signal.";
                     break;
                 default:
                     statusP.innerText = "Error: Unknown GPS Error.";
@@ -91,7 +91,7 @@ if (navigator.geolocation) {
         {
             enableHighAccuracy: true,
             maximumAge: 0,
-            timeout: 10000
+            timeout: 30000
         }
     );
 } else {
